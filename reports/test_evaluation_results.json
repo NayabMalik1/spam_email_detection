@@ -1,0 +1,17 @@
+{
+  "test_samples": 29077,
+  "metrics": {
+    "accuracy": 0.9890291295525673,
+    "precision": 0.9847719399538106,
+    "recall": 0.9921471678906421,
+    "f1_score": 0.9884457966605092
+  },
+  "predictions_count": {
+    "spam": 13856,
+    "ham": 15221
+  },
+  "true_distribution": {
+    "spam": 13753,
+    "ham": 15324
+  }
+}

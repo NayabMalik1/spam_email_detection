@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Spam Detection System - ANN Project</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
+            --gradient-danger: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+        }
+        
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 100px 0;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        .hero-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--gradient-success);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger {
+            background: var(--gradient-danger);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card.accuracy {
+            background: var(--gradient-success);
+        }
+        
+        .stat-card.precision {
+            background: var(--gradient-primary);
+        }
+        
+        .stat-card.recall {
+            background: linear-gradient(135deg, #7209b7 0%, #560bad 100%);
+        }
+        
+        .stat-card.f1 {
+            background: var(--gradient-danger);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .feature-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result-spam {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .result-ham {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 201, 240, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 201,240, 0); }
+        }
+        
+        .spam-badge {
+            background: var(--gradient-danger);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .ham-badge {
+            background: var(--gradient-success);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            border-radius: 5px;
+        }
+        
+        .model-architecture {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .dataset-table {
+            font-size: 0.9rem;
+        }
+        
+        .dataset-table th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 50px 0;
+            margin-top: 100px;
+        }
+        
+        .footer-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            margin-top: 30px;
+        }
+        
+        .course-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .course-info h5 {
+            color: var(--warning-color);
+            margin-bottom: 15px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-section {
+                padding: 60px 0;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+        
+        .api-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .status-connected {
+            background: var(--gradient-success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .status-disconnected {
+            background: var(--gradient-danger);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 250px;
+        }
+        
+        .demo-mode {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--warning-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>SpamGuard AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#predict">Predict</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dataset">Dataset</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports">Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Demo Mode Indicator -->
+    <div id="demoMode" class="demo-mode" style="display: none;">
+        <i class="fas fa-exclamation-triangle me-2"></i>Running in Demo Mode
+    </div>
+
+    <!-- API Status Toast -->
+    <div id="apiToast" class="toast align-items-center text-white bg-primary" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">
+                Loading...
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8" data-aos="fade-right">
+                    <h1 class="hero-title">Email Spam Detection System</h1>
+                    <p class="hero-subtitle">
+                        Advanced Artificial Neural Network (ANN) based system for detecting spam emails with 98.9% accuracy.
+                        This project is part of the Artificial Neural Networks course (BSE-635) under Dr. Aamir Arsalan.
+                    </p>
+                    <div class="course-info">
+                        <h5><i class="fas fa-university me-2"></i>Project Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Course:</strong> Artificial Neural Networks (BSE-635)</p>
+                                <p><strong>Instructor:</strong> Dr. Aamir Arsalan</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Model Accuracy:</strong> <span id="liveAccuracy">98.9%</span></p>
+                                <p><strong>API Status:</strong> <span id="apiStatusText" class="badge bg-success">Connected</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="#predict" class="btn btn-success btn-lg me-3">
+                            <i class="fas fa-bolt me-2"></i>Try Live Demo
+                        </a>
+                        <a href="http://127.0.0.1:8000/docs" target="_blank" class="btn btn-light btn-lg">
+                            <i class="fas fa-code me-2"></i>API Documentation
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4" data-aos="fade-left">
+                    <div class="text-center">
+                        <i class="fas fa-robot" style="font-size: 200px; color: rgba(255,255,255,0.2);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="container" id="stats">
+        <div class="row text-center mb-5">
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card accuracy">
+                    <div class="stat-number" id="accuracy">0.989</div>
+                    <div class="stat-label">Accuracy</div>
+                    <i class="fas fa-bullseye mt-3" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-card precision">
+                    <div class="stat-number" id="precision">0.985</div>
+                    <div class="stat-label">Precision</div>
+                    <i class="fas fa-check-circle mt-3" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-card recall">
+                    <div class="stat-number" id="recall">0.992</div>
+                    <div class="stat-label">Recall</div>
+                    <i class="fas fa-search mt-3" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+                <div class="stat-card f1">
+                    <div class="stat-number" id="f1">0.988</div>
+                    <div class="stat-label">F1 Score</div>
+                    <i class="fas fa-chart-line mt-3" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prediction Section -->
+    <section id="predict" class="container mb-5">
+        <div class="row">
+            <div class="col-lg-8" data-aos="fade-right">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-mail-bulk me-2"></i>Real-time Spam Detection
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="emailText" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Enter Email Text
+                            </label>
+                            <textarea class="form-control" id="emailText" rows="6" 
+                                      placeholder="Paste your email text here...">Congratulations! You've won a free iPhone. Click here to claim your prize now!</textarea>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="threshold" class="form-label">
+                                    <i class="fas fa-sliders-h me-2"></i>Detection Threshold
+                                </label>
+                                <input type="range" class="form-range" id="threshold" min="0" max="1" step="0.05" value="0.5">
+                                <div class="text-center">
+                                    <span id="thresholdValue" class="badge bg-primary">0.50</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="fas fa-upload me-2"></i>Upload File
+                                </label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="fileUpload" accept=".txt,.csv,.eml">
+                                    <button class="btn btn-outline-primary" type="button" onclick="uploadFile()">
+                                        <i class="fas fa-upload"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Supported formats: .txt, .csv, .eml</small>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button class="btn btn-primary btn-lg" onclick="predictSpam()" id="predictBtn">
+                                <i class="fas fa-search me-2"></i>Detect Spam
+                            </button>
+                            <button class="btn btn-outline-secondary btn-lg ms-2" onclick="clearText()">
+                                <i class="fas fa-eraser me-2"></i>Clear
+                            </button>
+                        </div>
+                        
+                        <!-- Loading Animation -->
+                        <div id="loading" class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Analyzing email content with ANN model...</p>
+                        </div>
+                        
+                        <!-- Result Display -->
+                        <div id="resultBox" class="result-box" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h4 id="resultTitle"></h4>
+                                    <p id="resultText" class="mb-2"></p>
+                                    <div class="mb-3">
+                                        <strong>Confidence:</strong>
+                                        <div class="progress">
+                                            <div id="confidenceBar" class="progress-bar" role="progressbar"></div>
+                                        </div>
+                                        <span id="confidenceValue" class="float-end"></span>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong>Probability:</strong> <span id="probabilityValue"></span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Threshold:</strong> <span id="thresholdUsed"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div id="resultIcon" style="font-size: 4rem;"></div>
+                                    <div id="resultBadge" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-left">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-lightbulb me-2"></i>Try These Examples
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="loadExample(1)">
+                                <i class="fas fa-gift me-2"></i>Spam Example
+                            </button>
+                            <small class="text-muted">"Congratulations! You've won a free iPhone. Click here to claim now!"</small>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-outline-success w-100 mb-2" onclick="loadExample(2)">
+                                <i class="fas fa-briefcase me-2"></i>Ham Example
+                            </button>
+                            <small class="text-muted">"Hi team, the meeting is scheduled for tomorrow at 2 PM in conference room B."</small>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-outline-danger w-100 mb-2" onclick="loadExample(3)">
+                                <i class="fas fa-pills me-2"></i>Spam Example
+                            </button>
+                            <small class="text-muted">"Buy cheap Viagra online without prescription! Special discount today only."</small>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-outline-info w-100 mb-2" onclick="loadExample(4)">
+                                <i class="fas fa-project-diagram me-2"></i>Ham Example
+                            </button>
+                            <small class="text-muted">"Please find attached the quarterly report for your review and feedback."</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-2"></i>Live Stats
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Total Predictions:</strong>
+                            <span id="totalPredictions" class="float-end">0</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Spam Detected:</strong>
+                            <span id="spamDetected" class="float-end">0</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Ham Detected:</strong>
+                            <span id="hamDetected" class="float-end">0</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>API Response Time:</strong>
+                            <span id="apiResponseTime" class="float-end">0ms</span>
+                        </div>
+                        <button class="btn btn-outline-primary w-100" onclick="updateStats()">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh Stats
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dataset Section -->
+    <section id="dataset" class="container mb-5">
+        <div class="card" data-aos="fade-up">
+            <div class="card-header">
+                <i class="fas fa-database me-2"></i>Dataset Information
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-info-circle me-2"></i>Real Dataset Info</h5>
+                        <p>Actual dataset used for training the ANN model:</p>
+                        <ul id="datasetInfo">
+                            <li><strong>Total Samples:</strong> 193,850</li>
+                            <li><strong>Spam Percentage:</strong> 31.4%</li>
+                            <li><strong>Train Samples:</strong> 135,696</li>
+                            <li><strong>Test Samples:</strong> 29,077</li>
+                            <li><strong>Features:</strong> 5,000 (TF-IDF)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-chart-bar me-2"></i>Class Distribution</h5>
+                        <div class="text-center">
+                            <canvas id="classDistributionChart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reports Section -->
+    <section id="reports" class="container mb-5">
+        <div class="card" data-aos="fade-up">
+            <div class="card-header">
+                <i class="fas fa-chart-line me-2"></i>Model Performance Reports
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-tachometer-alt me-2"></i>Real Performance Metrics</h5>
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <strong>Test Accuracy:</strong>
+                                <span class="float-end badge bg-success">98.90%</span>
+                            </div>
+                            <div class="list-group-item">
+                                <strong>Test Precision:</strong>
+                                <span class="float-end badge bg-primary">98.48%</span>
+                            </div>
+                            <div class="list-group-item">
+                                <strong>Test Recall:</strong>
+                                <span class="float-end badge bg-info">99.21%</span>
+                            </div>
+                            <div class="list-group-item">
+                                <strong>Test F1-Score:</strong>
+                                <span class="float-end badge bg-warning">98.84%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-cogs me-2"></i>Model Architecture</h5>
+                        <div class="model-architecture">
+                            <pre>Model: "Sequential ANN"
+────────────────────────────
+Input: 5000 features (TF-IDF)
+Hidden Layer 1: 512 neurons
+Hidden Layer 2: 256 neurons
+Hidden Layer 3: 128 neurons
+Hidden Layer 4: 64 neurons
+Output: 1 neuron (Sigmoid)
+────────────────────────────
+Total Params: 2,736,899
+Trainable: 2,734,977
+Optimizer: Adam (lr=0.001)
+Loss: Binary Crossentropy
+────────────────────────────
+Regularization: Dropout 0.3
+Batch Normalization: Yes
+Early Stopping: Patience=10
+</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="container mb-5">
+        <div class="card" data-aos="fade-up">
+            <div class="card-header">
+                <i class="fas fa-info-circle me-2"></i>About This Project
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-graduation-cap me-2"></i>Educational Purpose</h5>
+                        <p>This project demonstrates the application of Artificial Neural Networks for real-world email spam detection. It was developed as part of the BSE-635 course requirements.</p>
+                        
+                        <h5 class="mt-4"><i class="fas fa-code me-2"></i>Technical Stack</h5>
+                        <ul>
+                            <li><strong>Backend:</strong> Python, FastAPI, TensorFlow/Keras</li>
+                            <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript, Bootstrap 5</li>
+                            <li><strong>ML Libraries:</strong> scikit-learn, pandas, numpy</li>
+                            <li><strong>NLP:</strong> NLTK, TF-IDF Vectorization</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-check-circle me-2"></i>Project Achievements</h5>
+                        <ul>
+                            <li>Successfully trained ANN model with ~99% accuracy</li>
+                            <li>Implemented complete ML pipeline from data preprocessing to deployment</li>
+                            <li>Created interactive web interface for real-time predictions</li>
+                            <li>Developed RESTful API for integration with other systems</li>
+                            <li>Generated comprehensive performance reports and visualizations</li>
+                        </ul>
+                        
+                        <h5 class="mt-4"><i class="fas fa-link me-2"></i>API Endpoints</h5>
+                        <div class="list-group">
+                            <a href="http://127.0.0.1:8000/docs" target="_blank" class="list-group-item list-group-item-action">
+                                <i class="fas fa-book me-2"></i>Interactive API Documentation
+                            </a>
+                            <a href="http://127.0.0.1:8000/predict" target="_blank" class="list-group-item list-group-item-action">
+                                <i class="fas fa-bolt me-2"></i>Prediction Endpoint
+                            </a>
+                            <a href="http://127.0.0.1:8000/health" target="_blank" class="list-group-item list-group-item-action">
+                                <i class="fas fa-heartbeat me-2"></i>Health Check
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="footer-title">SpamGuard AI</h5>
+                    <p>Advanced email spam detection system using Artificial Neural Networks.</p>
+                    <p><strong>Course Project:</strong> BSE-635: Artificial Neural Networks</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <div class="footer-links">
+                        <a href="#home">Home</a>
+                        <a href="#predict">Predict</a>
+                        <a href="#dataset">Dataset</a>
+                        <a href="#reports">Reports</a>
+                        <a href="#about">About</a>
+                    </div>  
+                </div>
+                <div class="col-md-4">
+                    <h5 class="footer-title">Contact</h5>
+                    <p><i class="fas fa-envelope me-2"></i>
+                        <a href="mailto:student@university.edu">nayabzahoor08@gmail.com</a>
+                    </p>  
+                    <p><i class="fas fa-phone me-2"></i>0348-3848703</p>
+                    <p><i class="fas fa-map-marker-alt me-2"></i>Fatima jinnah women university Rwalapindi</p>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2026 SpamGuard AI. All rights reserved.
+            </div>
+        </div>      
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Chart.js for Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+
+        // API Base URL - IMPORTANT: Use 127.0.0.1 instead of localhost
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+
+        // Global variables
+        let totalPredictions = 0;
+        let spamCount = 0;
+        let hamCount = 0;
+        let isDemoMode = false;
+        let responseTimes = [];
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateThresholdValue();
+            checkAPIStatus();
+            updateStats();
+            initializeCharts();
+            setupEventListeners();
+            
+            // Auto-test on page load after 2 seconds
+            setTimeout(() => {
+                if (document.getElementById('emailText').value && totalPredictions === 0) {
+                    predictSpam();
+                }
+            }, 2000);
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Threshold slider update
+            document.getElementById('threshold').addEventListener('input', updateThresholdValue);
+            
+            // File upload change
+            document.getElementById('fileUpload').addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    uploadFile();
+                }
+            });
+        }
+
+        // Threshold slider update
+        function updateThresholdValue() {
+            const threshold = document.getElementById('threshold').value;
+            document.getElementById('thresholdValue').textContent = parseFloat(threshold).toFixed(2);
+        }
+
+        // Check API Status
+        async function checkAPIStatus() {
+            try {
+                const startTime = performance.now();
+                const response = await fetch(`${API_BASE_URL}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.status === 'healthy' || data.status === 'degraded') {
+                        document.getElementById('apiStatusText').className = 'badge bg-success';
+                        document.getElementById('apiStatusText').textContent = 'Connected';
+                        isDemoMode = data.status === 'degraded' || (data.details && data.details.demo_mode);
+                        
+                        if (isDemoMode) {
+                            document.getElementById('demoMode').style.display = 'block';
+                            showToast('Connected to API (Demo Mode)', 'warning');
+                        } else {
+                            document.getElementById('demoMode').style.display = 'none';
+                            showToast('API Connected Successfully', 'success');
+                        }
+                    } else {
+                        document.getElementById('apiStatusText').className = 'badge bg-danger';
+                        document.getElementById('apiStatusText').textContent = 'Error';
+                        showToast('API Health Check Failed', 'danger');
+                        isDemoMode = true;
+                        document.getElementById('demoMode').style.display = 'block';
+                    }
+                    
+                    document.getElementById('apiResponseTime').textContent = responseTime + 'ms';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('API Status Check Error:', error);
+                document.getElementById('apiStatusText').className = 'badge bg-danger';
+                document.getElementById('apiStatusText').textContent = 'Disconnected';
+                isDemoMode = true;
+                document.getElementById('demoMode').style.display = 'block';
+                showToast('API Connection Failed - Using Demo Mode', 'warning');
+            }
+        }
+
+        // Predict Spam Function
+        async function predictSpam() {
+            const emailText = document.getElementById('emailText').value.trim();
+            const threshold = parseFloat(document.getElementById('threshold').value);
+            
+            if (!emailText) {
+                showToast('Please enter email text', 'warning');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('predictBtn').disabled = true;
+            document.getElementById('resultBox').style.display = 'none';
+
+            try {
+                const startTime = performance.now();
+                
+                // Try to use real API first
+                const response = await fetch(`${API_BASE_URL}/api/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: emailText,
+                        threshold: threshold
+                    })
+                });
+
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+                responseTimes.push(responseTime);
+                
+                // Calculate average response time
+                const avgResponseTime = Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length);
+                document.getElementById('apiResponseTime').textContent = avgResponseTime + 'ms (avg)';
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('predictBtn').disabled = false;
+
+                    // Display result
+                    displayResult(result, responseTime);
+                    
+                    // Update statistics
+                    updateStatistics(result);
+                    
+                    showToast('Prediction successful!', 'success');
+                    
+                } else {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                
+            } catch (error) {
+                console.error('Prediction API Error:', error);
+                
+                // Fallback to demo mode
+                const demoResult = getDemoPrediction(emailText, threshold);
+                const responseTime = 50; // Simulated response time for demo
+                
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('predictBtn').disabled = false;
+
+                // Display demo result
+                displayResult(demoResult, responseTime);
+                
+                // Update statistics
+                updateStatistics(demoResult);
+                
+                showToast('Using demo prediction (API unavailable)', 'warning');
+                isDemoMode = true;
+                document.getElementById('demoMode').style.display = 'block';
+            }
+        }
+
+        // Demo prediction logic
+        function getDemoPrediction(text, threshold) {
+            const textLower = text.toLowerCase();
+            
+            // Spam keywords
+            const spamKeywords = [
+                'win', 'winner', 'won', 'free', 'prize', 'congratulations',
+                'click here', 'click now', 'limited time', 'special offer',
+                'buy now', 'discount', 'cheap', 'viagra', 'cialis', 'levitra',
+                'weight loss', 'lose weight', 'make money', 'earn money',
+                'work from home', 'get rich', 'investment', 'bitcoin',
+                'crypto', 'lottery', 'million', 'billion', 'dollars',
+                'urgent', 'important', 'alert', 'warning', 'verify',
+                'account suspended', 'password reset', 'security alert',
+                'click the link', 'visit website', 'call now', 'text now'
+            ];
+            
+            // Ham keywords (professional/legitimate)
+            const hamKeywords = [
+                'meeting', 'team', 'project', 'report', 'deadline',
+                'conference', 'presentation', 'agenda', 'minutes',
+                'attachment', 'attached', 'please find', 'review',
+                'feedback', 'suggestions', 'questions', 'concerns',
+                'schedule', 'calendar', 'reminder', 'appointment',
+                'doctor', 'dentist', 'interview', 'resume', 'cv',
+                'application', 'job', 'position', 'hire', 'recruitment',
+                'invoice', 'payment', 'bill', 'receipt', 'transaction',
+                'shipping', 'delivery', 'tracking', 'order', 'purchase',
+                'subscription', 'newsletter', 'update', 'notification'
+            ];
+            
+            let spamScore = 0;
+            let hamScore = 0;
+            
+            // Check for spam keywords
+            spamKeywords.forEach(keyword => {
+                if (textLower.includes(keyword)) {
+                    spamScore += 1;
+                }
+            });
+            
+            // Check for ham keywords
+            hamKeywords.forEach(keyword => {
+                if (textLower.includes(keyword)) {
+                    hamScore += 1;
+                }
+            });
+            
+            // Calculate probability
+            const totalScore = spamScore + hamScore;
+            let probability = 0.5; // Default
+            
+            if (totalScore > 0) {
+                probability = spamScore / totalScore;
+            }
+            
+            // Adjust based on text length and special characters
+            const hasExclamation = (text.match(/!/g) || []).length;
+            const hasDollar = text.includes('$');
+            const hasAllCaps = text.split(' ').some(word => word.length > 2 && word === word.toUpperCase());
+            
+            if (hasExclamation > 2) probability += 0.1;
+            if (hasDollar) probability += 0.15;
+            if (hasAllCaps) probability += 0.1;
+            
+            // Cap probability between 0 and 1
+            probability = Math.max(0.05, Math.min(0.95, probability));
+            
+            const isSpam = probability > threshold;
+            const confidence = isSpam ? probability : 1 - probability;
+            
+            return {
+                is_spam: isSpam,
+                probability: probability,
+                confidence: confidence,
+                prediction_label: isSpam ? 'SPAM' : 'HAM',
+                threshold: threshold,
+                demo_mode: true
+            };
+        }
+
+        // Display Result
+        function displayResult(result, responseTime) {
+            const resultBox = document.getElementById('resultBox');
+            const isSpam = result.is_spam;
+            const probability = result.probability || 0.5;
+            const confidence = result.confidence || 0.8;
+            
+            // Set box color
+            resultBox.className = `result-box ${isSpam ? 'result-spam' : 'result-ham'}`;
+            
+            // Set content
+            document.getElementById('resultTitle').textContent = 
+                isSpam ? '⚠️ SPAM Detected!' : '✅ Legitimate Email';
+            
+            document.getElementById('resultText').textContent = 
+                isSpam ? 'This email has been identified as spam.' : 'This email appears to be legitimate.';
+            
+            document.getElementById('probabilityValue').textContent = 
+                (probability * 100).toFixed(2) + '%';
+            
+            document.getElementById('thresholdUsed').textContent = result.threshold || 0.5;
+            
+            // Set confidence bar
+            const confidencePercent = confidence * 100;
+            const confidenceBar = document.getElementById('confidenceBar');
+            confidenceBar.style.width = confidencePercent + '%';
+            confidenceBar.className = `progress-bar ${isSpam ? 'bg-danger' : 'bg-success'}`;
+            confidenceBar.setAttribute('aria-valuenow', confidencePercent);
+            document.getElementById('confidenceValue').textContent = confidencePercent.toFixed(1) + '%';
+            
+            // Set icon and badge
+            const resultIcon = document.getElementById('resultIcon');
+            const resultBadge = document.getElementById('resultBadge');
+            
+            if (isSpam) {
+                resultIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                resultBadge.innerHTML = '<span class="spam-badge"><i class="fas fa-ban me-1"></i>SPAM</span>';
+            } else {
+                resultIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                resultBadge.innerHTML = '<span class="ham-badge"><i class="fas fa-check me-1"></i>HAM</span>';
+            }
+            
+            // Show result box with animation
+            resultBox.style.display = 'block';
+            resultBox.style.opacity = '0';
+            resultBox.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                resultBox.style.transition = 'all 0.5s ease';
+                resultBox.style.opacity = '1';
+                resultBox.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // Scroll to result
+            setTimeout(() => {
+                resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Update Statistics
+        function updateStatistics(result) {
+            totalPredictions++;
+            
+            if (result.is_spam) {
+                spamCount++;
+            } else {
+                hamCount++;
+            }
+            
+            updateStats();
+        }
+
+        // Update Stats Display
+        function updateStats() {
+            document.getElementById('totalPredictions').textContent = totalPredictions;
+            document.getElementById('spamDetected').textContent = spamCount;
+            document.getElementById('hamDetected').textContent = hamCount;
+        }
+
+        // Example Emails
+        const examples = {
+            1: "Congratulations! You've won a free iPhone. Click here to claim your prize now! Limited time offer! Don't miss this amazing opportunity to get the latest iPhone for FREE. Just pay shipping and handling. Click the link now: bit.ly/freeiphone2024",
+            2: "Hi team, the meeting is scheduled for tomorrow at 2 PM in conference room B. Please bring your project reports and be prepared to discuss the Q3 milestones. The agenda has been attached to this email. Let me know if you have any conflicts.",
+            3: "BUY CHEAP VIAGRA ONLINE WITHOUT PRESCRIPTION! Special discount today only. 100% money back guarantee! Get the best quality generic medications at unbelievable prices. Visit our website now: www.cheapmedsonline.com Limited stock available!",
+            4: "Please find attached the quarterly report for your review and feedback. I've highlighted the key performance indicators on pages 5-8. Let me know if you have any questions or need additional information. We can schedule a call next week to discuss."
+        };
+
+        function loadExample(exampleId) {
+            const emailText = examples[exampleId];
+            document.getElementById('emailText').value = emailText;
+            
+            const exampleType = exampleId <= 2 ? 'Ham' : 'Spam';
+            showToast(`${exampleType} Example ${exampleId} loaded`, 'info');
+        }
+
+        // Clear Text
+        function clearText() {
+            document.getElementById('emailText').value = '';
+            document.getElementById('resultBox').style.display = 'none';
+            showToast('Text cleared', 'info');
+        }
+
+        // Upload File
+        function uploadFile() {
+            const fileInput = document.getElementById('fileUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showToast('Please select a file first', 'warning');
+                return;
+            }
+            
+            // Check file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('File size must be less than 10MB', 'danger');
+                fileInput.value = ''; // Clear the file input
+                return;
+            }
+            
+            // Check file type
+            const validExtensions = ['.txt', '.csv', '.eml', '.json'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!validExtensions.includes(fileExtension)) {
+                showToast('Please select a .txt, .csv, .eml, or .json file', 'danger');
+                fileInput.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('emailText').value = e.target.result;
+                showToast(`File "${file.name}" loaded successfully`, 'success');
+                
+                // Auto-predict after loading
+                setTimeout(() => {
+                    predictSpam();
+                }, 500);
+            };
+            
+            reader.onerror = function() {
+                showToast('Error reading file', 'danger');
+                fileInput.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Class Distribution Chart
+            const ctx = document.getElementById('classDistributionChart').getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Ham (68.6%)', 'Spam (31.4%)'],
+                        datasets: [{
+                            data: [68.6, 31.4],
+                            backgroundColor: [
+                                'rgba(76, 201, 240, 0.8)',
+                                'rgba(247, 37, 133, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(76, 201, 240, 1)',
+                                'rgba(247, 37, 133, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 12,
+                                        family: 'Poppins'
+                                    },
+                                    color: '#333',
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.raw}%`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            }
+        }
+
+        // Toast Notification
+        function showToast(message, type = 'info') {
+            // Remove any existing toasts
+            const existingToasts = document.querySelectorAll('.toast:not(#apiToast)');
+            existingToasts.forEach(toast => toast.remove());
+            
+            // Create new toast
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type}" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas fa-${getToastIcon(type)} me-2"></i>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Add to document
+            document.body.insertAdjacentHTML('beforeend', toastHtml);
+            
+            // Show toast
+            const toastElement = document.getElementById(toastId);
+            const bsToast = new bootstrap.Toast(toastElement, { 
+                delay: 3000,
+                animation: true 
+            });
+            bsToast.show();
+            
+            // Remove after hide
+            toastElement.addEventListener('hidden.bs.toast', function () {
+                toastElement.remove();
+            });
+        }
+
+        // Get icon for toast type
+        function getToastIcon(type) {
+            switch(type) {
+                case 'success': return 'check-circle';
+                case 'danger': return 'exclamation-circle';
+                case 'warning': return 'exclamation-triangle';
+                case 'info': return 'info-circle';
+                default: return 'info-circle';
+            }
+        }
+
+        // Auto-refresh API status every 30 seconds
+        setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                checkAPIStatus();
+            }
+        }, 30000);
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

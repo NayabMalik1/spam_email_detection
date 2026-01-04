@@ -1,0 +1,164 @@
+# ===========================================
+# Email Spam Detection System Configuration
+# ===========================================
+
+# Model Configuration
+model:
+  name: "email_spam_classifier_ann"
+  input_dim: 5000
+  hidden_layers: [512, 256, 128, 64]
+  activation: "relu"
+  output_activation: "sigmoid"
+  dropout_rate: 0.3
+  l2_regularization: 0.001
+  batch_normalization: true
+  
+# Model Persistence
+model_persistence:
+  save_format: "h5"
+  save_best_only: true
+  monitor_metric: "val_loss"
+  mode: "min"
+  checkpoint_dir: "models/checkpoints/"
+  model_filename: "spam_classifier_{timestamp}.h5"
+  
+# Training Configuration
+training:
+  batch_size: 64
+  epochs: 100
+  learning_rate: 0.001
+  optimizer: "adam"
+  loss: "binary_crossentropy"
+  metrics: ["accuracy", "precision", "recall"]
+  validation_split: 0.2
+  early_stopping_patience: 10
+  reduce_lr_patience: 5
+  reduce_lr_factor: 0.5
+  shuffle_buffer_size: 1000
+  use_class_weights: true
+  
+# Data Configuration
+data:
+  dataset_path: "data/raw/spam_email.csv"
+  text_column: "text"
+  label_column: "label"
+  max_features: 5000
+  max_sequence_length: 1000
+  test_size: 0.15
+  val_size: 0.15
+  random_state: 42
+  
+# Text Processing
+text_processing:
+  remove_html: true
+  remove_punctuation: true
+  remove_numbers: true
+  remove_stopwords: true
+  stem_words: true
+  lemmatize: false
+  min_word_length: 2
+  language: "english"
+  custom_stopwords: []  # Add domain-specific stopwords
+  
+# Preprocessing
+preprocessing:
+  test_size: 0.15
+  val_size: 0.15
+  random_state: 42
+  stratify_split: true
+  normalize_text: true
+  
+# Evaluation
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "roc_auc", "confusion_matrix"]
+  cross_validation_folds: 5
+  classification_threshold: 0.5
+  confidence_thresholds: [0.3, 0.5, 0.7, 0.9]
+  
+# Paths
+paths:
+  processed_data: "data/processed/"
+  models: "models/saved_models/"
+  logs: "logs/"
+  outputs: "outputs/"
+  plots: "outputs/plots/"
+  reports: "outputs/reports/"
+  temp: "temp/"
+  
+# API Configuration
+api:
+  host: "127.0.0.1"  # Changed from 0.0.0.0 for Windows compatibility
+  port: 8000
+  debug: false
+  workers: 4
+  title: "Email Spam Detection API"
+  description: "ANN-based Email Spam Classification System"
+  version: "1.0.0"
+  docs_url: "/api/docs"
+  redoc_url: "/api/redoc"
+  openapi_url: "/api/openapi.json"
+  
+# Web Interface
+web:
+  title: "Email Spam Detection System"
+  theme: "dark"
+  animations: true
+  max_file_size_mb: 10
+  supported_formats: ["txt", "eml", "csv", "json"]
+  default_examples: 4
+  
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/spam_detector.log"
+  max_file_size_mb: 10
+  backup_count: 5
+  enable_console: true
+  
+# Security Settings
+security:
+  cors_origins: ["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:3000"]
+  rate_limit_requests: 100
+  enable_auth: false
+  api_key_header: "X-API-Key"
+  enable_input_sanitization: true
+  
+# Monitoring
+monitoring:
+  enable_prometheus: false
+  enable_health_check: true
+  metrics_endpoint: "/api/metrics"
+  health_endpoint: "/api/health"
+  prediction_stats: true
+  collect_metrics: true
+  
+# Feature Flags
+features:
+  enable_batch_prediction: true
+  enable_file_upload: true
+  enable_examples: true
+  enable_real_time_stats: true
+  cache_predictions: true
+  cache_ttl_seconds: 300
+  enable_detailed_analysis: true
+  
+# Performance Settings
+performance:
+  max_batch_size: 100
+  prediction_timeout_seconds: 30
+  enable_caching: true
+  cache_size_mb: 100
+  
+# Notification Settings (Optional)
+notifications:
+  enable_email_alerts: false
+  alert_threshold: 0.95  # Confidence threshold for alerts
+  admin_email: "admin@example.com"
+  
+# Deployment Settings
+deployment:
+  environment: "development"  # development, staging, production
+  enable_auto_scaling: false
+  min_instances: 1
+  max_instances: 3
