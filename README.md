@@ -35,7 +35,7 @@ email_spam_ann/
 │   └── config.yaml
 │
 ├── data/
-│   ├── raw/
+│   ├── raw/your_dataset
 │   ├── processed/
 │   └── dataset_metadata.json
 │
